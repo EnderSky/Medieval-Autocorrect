@@ -10,7 +10,9 @@ A Chrome extension that automatically transforms your typing into glorious Medie
 - **400+ Word Dictionary**: A vast lexicon of period-appropriate vocabulary with multiple variations per word
 - **Random Variations**: Each word has 2-5 medieval alternatives that are randomly selected, so typing the same sentence twice yields different results
 - **Smart Capitalization**: Preserves your original capitalization (HELLO → HAIL, Hello → Hail)
-- **Works Everywhere**: Functions in text inputs, textareas, and contentEditable elements across all websites
+- **Works (Almost) Everywhere**: Functions in most text inputs (including search bars), textareas, contentEditable elements, and online text editors (with the exception of certain editors like Google Docs)
+- **Dynamic Content Support**: Automatically works with dynamically loaded elements in single-page applications
+- **Multiple Input Types**: Supports text, search, email, URL, and tel input fields
 - **Beautiful UI**: Medieval-themed popup with toggle controls
 - **Dictionary Mode**: Uses local dictionary for instant translations (default)
 - **LLM Mode**: Experimental API mode (documented as non-functional due to CORS restrictions)

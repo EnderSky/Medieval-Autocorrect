@@ -95,6 +95,27 @@
         padding: 10px;
       }
       
+      #permissionButton {
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        font-size: 12px;
+        padding: 10px;
+      }
+      
+      #permissionButton.granted {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+      }
+      
+      .permission-status {
+        text-align: center;
+        font-size: 11px;
+        padding: 6px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        margin-top: 8px;
+        color: #c9a961;
+      }
+      
       .status {
         text-align: center;
         font-size: 12px;
@@ -129,8 +150,14 @@
       
       <div class="section">
         <div class="section-title">Translation Mode</div>
-        <button id="modeToggle"></button>
+        <button id="modeToggle" disabled></button>
       </div>
+      
+      <!-- <div class="section">
+        <div class="section-title">Google Docs Access</div>
+        <button id="permissionButton"></button>
+        <div class="permission-status" id="permissionStatus"></div>
+      </div> -->
       
       <div class="status">
         Mode: <span class="mode-badge" id="currentMode">DICTIONARY</span>

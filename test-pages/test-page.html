@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medieval Autocorrect Test Page</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5dc;
+        }
+        h1 {
+            color: #8b4513;
+            text-align: center;
+            border-bottom: 3px solid #8b4513;
+            padding-bottom: 10px;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #8b4513;
+            margin-top: 0;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #8b4513;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .contenteditable {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #8b4513;
+            border-radius: 4px;
+            font-size: 16px;
+            background: white;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #5d4037;
+        }
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 20px;
+        }
+        .dynamic-container {
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+        }
+        button {
+            background: #8b4513;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #6d3710;
+        }
+    </style>
+</head>
+<body>
+    <h1>⚔️ Medieval Autocorrect Test Page ⚔️</h1>
+    
+    <div class="instructions">
+        <strong>Instructions:</strong> Make sure the Medieval Autocorrect extension is enabled, then type in each field below. 
+        Type a word followed by a space to trigger the transformation. Try words like: "hello you friend good yes please think"
+    </div>
+
+    <div class="test-section">
+        <h2>1. Standard Text Input</h2>
+        <label>Regular text input (type="text"):</label>
+        <input type="text" placeholder="Type here: hello friend how are you ">
+    </div>
+
+    <div class="test-section">
+        <h2>2. Search Input</h2>
+        <label>Search bar (type="search"):</label>
+        <input type="search" placeholder="Search: hello friend good ">
+    </div>
+
+    <div class="test-section">
+        <h2>3. Email Input</h2>
+        <label>Email input (type="email"):</label>
+        <input type="email" placeholder="Type: hello friend yes ">
+    </div>
+
+    <div class="test-section">
+        <h2>4. URL Input</h2>
+        <label>URL input (type="url"):</label>
+        <input type="url" placeholder="Type: hello friend good ">
+    </div>
+
+    <div class="test-section">
+        <h2>5. Textarea</h2>
+        <label>Standard textarea:</label>
+        <textarea placeholder="Type here: hello my friend how are you today I think you are very good and brave "></textarea>
+    </div>
+
+    <div class="test-section">
+        <h2>6. ContentEditable Div</h2>
+        <label>ContentEditable element (like rich text editors):</label>
+        <div class="contenteditable" contenteditable="true">Type here: hello friend please think good </div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Dynamically Loaded Content</h2>
+        <label>Click to add a new input field dynamically:</label>
+        <button onclick="addDynamicInput()">Add Dynamic Input Field</button>
+        <div id="dynamic-container" class="dynamic-container">
+            <!-- Dynamic inputs will be added here -->
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>8. Nested ContentEditable</h2>
+        <label>Complex nested structure (like Google Docs):</label>
+        <div class="contenteditable" contenteditable="true">
+            <div>
+                <p>Type in this paragraph: hello friend good </p>
+                <p>Or in this one: please thank you yes </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>9. Test Phrases</h2>
+        <label>Try typing these test phrases in any field above:</label>
+        <ul>
+            <li><code>hello my friend how are you </code></li>
+            <li><code>please think about this good idea </code></li>
+            <li><code>yes I really want to help you </code></li>
+            <li><code>thank you very much my good friend </code></li>
+            <li><code>I think you are very brave and strong </code></li>
+        </ul>
+    </div>
+
+    <script>
+        let dynamicCount = 0;
+        
+        function addDynamicInput() {
+            dynamicCount++;
+            const container = document.getElementById('dynamic-container');
+            
+            const wrapper = document.createElement('div');
+            wrapper.style.marginTop = '10px';
+            
+            const label = document.createElement('label');
+            label.textContent = `Dynamic Input #${dynamicCount}:`;
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = `Dynamic field ${dynamicCount}: hello friend good `;
+            
+            wrapper.appendChild(label);
+            wrapper.appendChild(input);
+            container.appendChild(wrapper);
+        }
+        
+        // Simulate SPA-style dynamic loading after page load
+        setTimeout(() => {
+            console.log('Test page loaded - extension should work with all inputs');
+        }, 1000);
+    </script>
+</body>
+</html>

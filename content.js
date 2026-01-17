@@ -1,5 +1,28 @@
 let isTransforming = false;
 
+// Check if we have permission to run on this page (especially for Google Docs)
+async function checkPagePermission() {
+  if (window.location.hostname.includes('google.com')) {
+    try {
+      const hasPermission = await chrome.permissions.contains({
+        origins: [
+          "*://docs.google.com/*",
+          "*://*.google.com/*"
+        ]
+      });
+      
+      if (!hasPermission) {
+        console.log('Medieval Autocorrect: No permission for Google sites. Please grant access in the extension popup.');
+        return false;
+      }
+    } catch (error) {
+      // If permission check fails, continue anyway (might be running on non-Google page)
+      console.log('Medieval Autocorrect: Permission check skipped');
+    }
+  }
+  return true;
+}
+
 // Medieval English dictionary - all values are arrays for consistent random selection
 const dictionary = {
   // Pronouns
@@ -560,9 +583,23 @@ function preserveCase(original, replacement) {
 }
 
 function isEditable(el) {
-  return (el.tagName === "INPUT" && el.type === "text") || 
-         el.tagName === "TEXTAREA" || 
-         el.contentEditable === "true";
+  // Check for standard editable elements
+  if (el.tagName === "TEXTAREA") return true;
+  
+  // Check for all text-based input types (including search bars)
+  if (el.tagName === "INPUT") {
+    const type = el.type ? el.type.toLowerCase() : "text";
+    const editableTypes = ["text", "search", "email", "url", "tel", "password"];
+    return editableTypes.includes(type);
+  }
+  
+  // Check for contentEditable (includes Google Docs and rich text editors)
+  if (el.contentEditable === "true" || el.isContentEditable) return true;
+  
+  // Check for elements with designMode (rare but used by some editors)
+  if (el.ownerDocument && el.ownerDocument.designMode === "on") return true;
+  
+  return false;
 }
 
 // Translate word using free LLM API (Hugging Face)
@@ -610,34 +647,111 @@ async function translateWithLLM(word) {
 }
 
 // Handle input and textarea elements
-document.addEventListener("input", async (e) => {
-  if (isTransforming) return;
+function setupEventListeners(doc) {
+  doc.addEventListener("input", async (e) => {
+    if (isTransforming) return;
 
-  const el = e.target;
-  if (!isEditable(el)) return;
-
-  // Get current mode and enabled state from storage
-  try {
-    const result = await chrome.storage.local.get(["useLLM", "enabled"]);
+    const el = e.target;
+    if (!isEditable(el)) return;
     
-    // Check enabled state from storage
-    if (result.enabled === false) return;
-  
-  const useLLM = result.useLLM || false;
+    // Check page permission (especially for Google Docs)
+    const hasPermission = await checkPagePermission();
+    if (!hasPermission) return;
 
-    // Handle standard input/textarea
-    if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-      handleStandardInput(el, useLLM);
+    // Get current mode and enabled state from storage
+    try {
+      const result = await chrome.storage.local.get(["useLLM", "enabled"]);
+      
+      // Check enabled state from storage
+      if (result.enabled === false) return;
+    
+      const useLLM = result.useLLM || false;
+
+      // Handle standard input/textarea
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        handleStandardInput(el, useLLM);
+      }
+      // Handle contentEditable
+      else if (el.contentEditable === "true" || el.isContentEditable) {
+        handleContentEditable(el, useLLM);
+      }
+    } catch (error) {
+      // Extension context invalidated - silently ignore
+      return;
     }
-    // Handle contentEditable
-    else if (el.contentEditable === "true") {
-      handleContentEditable(el, useLLM);
+  }, true); // Use capture phase to catch events from dynamically loaded elements
+
+  // Also listen for keyup event for better compatibility with search inputs
+  doc.addEventListener("keyup", async (e) => {
+    if (isTransforming) return;
+    
+    // Only trigger on space key
+    if (e.key !== " " && e.code !== "Space") return;
+
+    const el = e.target;
+    if (!isEditable(el)) return;
+    
+    // Check page permission (especially for Google Docs)
+    const hasPermission = await checkPagePermission();
+    if (!hasPermission) return;
+
+    // Get current mode and enabled state from storage
+    try {
+      const result = await chrome.storage.local.get(["useLLM", "enabled"]);
+      
+      // Check enabled state from storage
+      if (result.enabled === false) return;
+    
+      const useLLM = result.useLLM || false;
+
+      // Handle standard input/textarea
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        handleStandardInput(el, useLLM);
+      }
+      // Handle contentEditable
+      else if (el.contentEditable === "true" || el.isContentEditable) {
+        handleContentEditable(el, useLLM);
+      }
+    } catch (error) {
+      // Extension context invalidated - silently ignore
+      return;
     }
-  } catch (error) {
-    // Extension context invalidated - silently ignore
-    return;
-  }
-});
+  }, true);
+
+  // Also listen for focus events to handle dynamically loaded elements
+  doc.addEventListener("focus", async (e) => {
+    const el = e.target;
+    if (isEditable(el)) {
+      // Just mark that this element is editable - actual transformation happens on input
+      el.setAttribute("data-medieval-enabled", "true");
+    }
+  }, true);
+}
+
+// Setup listeners for main document
+setupEventListeners(document);
+
+// Handle iframes (like Google Docs)
+function setupIframeListeners() {
+  // Find all iframes and setup listeners
+  const iframes = document.querySelectorAll('iframe');
+  iframes.forEach(iframe => {
+    try {
+      // Check if we can access the iframe (same-origin policy)
+      if (iframe.contentDocument) {
+        setupEventListeners(iframe.contentDocument);
+      }
+    } catch (e) {
+      // Cross-origin iframe, cannot access
+      console.log('Cannot access iframe (cross-origin)');
+    }
+  });
+}
+
+// Setup iframe listeners after a delay to catch dynamically loaded iframes
+setTimeout(setupIframeListeners, 1000);
+setTimeout(setupIframeListeners, 3000);
+setTimeout(setupIframeListeners, 5000);
 
 function handleStandardInput(el, useLLM) {
   isTransforming = true;
@@ -694,14 +808,39 @@ function handleStandardInput(el, useLLM) {
 function handleContentEditable(el, useLLM) {
   isTransforming = true;
 
-  const selection = window.getSelection();
-  if (!selection.rangeCount) {
+  // Get the correct window and document context (important for iframes like Google Docs)
+  const doc = el.ownerDocument;
+  const win = doc.defaultView || doc.parentWindow;
+  const selection = win.getSelection();
+  
+  if (!selection || !selection.rangeCount) {
     isTransforming = false;
     return;
   }
 
   const range = selection.getRangeAt(0);
-  const textNode = range.startContainer;
+  let textNode = range.startContainer;
+  
+  // Handle case where cursor is in an element node, not a text node
+  if (textNode.nodeType === Node.ELEMENT_NODE) {
+    // Try to find the last text node in the element
+    const walker = document.createTreeWalker(
+      textNode,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+    let lastTextNode = null;
+    while (walker.nextNode()) {
+      lastTextNode = walker.currentNode;
+    }
+    if (lastTextNode) {
+      textNode = lastTextNode;
+    } else {
+      isTransforming = false;
+      return;
+    }
+  }
   
   if (textNode.nodeType !== Node.TEXT_NODE) {
     isTransforming = false;
@@ -726,14 +865,20 @@ function handleContentEditable(el, useLLM) {
           const wordStart = textBeforeCursor.length - lastWord.length - whitespace.length;
           
           // Replace the word
-          textNode.textContent = text.substring(0, wordStart) + replacement + whitespace + text.substring(cursorPos);
+          const newText = text.substring(0, wordStart) + replacement + whitespace + text.substring(cursorPos);
+          textNode.textContent = newText;
           
           // Restore cursor position
           const newPos = cursorPos + (replacement.length - lastWord.length);
-          range.setStart(textNode, newPos);
-          range.setEnd(textNode, newPos);
-          selection.removeAllRanges();
-          selection.addRange(range);
+          try {
+            range.setStart(textNode, newPos);
+            range.setEnd(textNode, newPos);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          } catch (e) {
+            // If range setting fails (can happen in complex editors), just continue
+            console.log('Could not restore cursor position');
+          }
         }
         isTransforming = false;
       }).catch(() => {
@@ -747,14 +892,20 @@ function handleContentEditable(el, useLLM) {
         const wordStart = textBeforeCursor.length - lastWord.length - whitespace.length;
         
         // Replace the word
-        textNode.textContent = text.substring(0, wordStart) + replacement + whitespace + text.substring(cursorPos);
+        const newText = text.substring(0, wordStart) + replacement + whitespace + text.substring(cursorPos);
+        textNode.textContent = newText;
         
         // Restore cursor position
         const newPos = cursorPos + (replacement.length - lastWord.length);
-        range.setStart(textNode, newPos);
-        range.setEnd(textNode, newPos);
-        selection.removeAllRanges();
-        selection.addRange(range);
+        try {
+          range.setStart(textNode, newPos);
+          range.setEnd(textNode, newPos);
+          selection.removeAllRanges();
+          selection.addRange(range);
+        } catch (e) {
+          // If range setting fails (can happen in complex editors), just continue
+          console.log('Could not restore cursor position');
+        }
       }
       isTransforming = false;
     }
@@ -764,3 +915,44 @@ function handleContentEditable(el, useLLM) {
 }
 
 // Both enabled and useLLM are now read directly from storage on each input event
+
+// Observe DOM changes to handle dynamically loaded content (SPAs, infinite scroll, etc.)
+const observer = new MutationObserver((mutations) => {
+  // Check for new iframes
+  mutations.forEach(mutation => {
+    mutation.addedNodes.forEach(node => {
+      if (node.nodeName === 'IFRAME') {
+        setTimeout(() => {
+          try {
+            if (node.contentDocument) {
+              setupEventListeners(node.contentDocument);
+            }
+          } catch (e) {
+            // Cross-origin iframe
+          }
+        }, 100);
+      }
+      // Also check if the node contains iframes
+      if (node.querySelectorAll) {
+        const iframes = node.querySelectorAll('iframe');
+        iframes.forEach(iframe => {
+          setTimeout(() => {
+            try {
+              if (iframe.contentDocument) {
+                setupEventListeners(iframe.contentDocument);
+              }
+            } catch (e) {
+              // Cross-origin iframe
+            }
+          }, 100);
+        });
+      }
+    });
+  });
+});
+
+// Start observing the document with the configured parameters
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});

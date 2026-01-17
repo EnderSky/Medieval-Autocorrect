@@ -3,7 +3,11 @@
   "name": "Medieval English Autocorrect",
   "version": "1.0",
   "description": "Verily, thy words shall be transformed into medieval English.",
-  "permissions": ["storage"],
+  "permissions": ["storage", "scripting"],
+  "optional_host_permissions": [
+    "*://docs.google.com/*",
+    "*://*.google.com/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -20,7 +24,9 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "all_frames": true,
+      "match_about_blank": true
     }
   ]
 }

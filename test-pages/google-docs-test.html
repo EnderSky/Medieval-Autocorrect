@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Docs Simulator - Medieval Autocorrect Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+            padding-bottom: 10px;
+        }
+        .instructions {
+            background: #e8f0fe;
+            padding: 15px;
+            border-left: 4px solid #1a73e8;
+            margin: 20px 0;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        /* Google Docs-like editor */
+        .docs-editor {
+            min-height: 300px;
+            padding: 40px 60px;
+            background: white;
+            border: 1px solid #ddd;
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            outline: none;
+        }
+        .docs-container {
+            background: #f9fbfd;
+            padding: 20px;
+            border: 1px solid #c6dafc;
+        }
+        /* Iframe editor */
+        .iframe-container {
+            border: 2px solid #1a73e8;
+            background: white;
+            margin: 20px 0;
+        }
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+        /* Rich text editor simulation */
+        .rich-editor {
+            border: 1px solid #ddd;
+            padding: 20px;
+            min-height: 200px;
+            background: white;
+            font-family: 'Georgia', serif;
+            font-size: 14pt;
+            line-height: 1.6;
+        }
+        .toolbar {
+            background: #f5f5f5;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+        button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏰 Google Docs Style Test - Medieval Autocorrect</h1>
+    
+    <div class="instructions">
+        <strong>Testing Instructions:</strong>
+        <ol>
+            <li>Make sure the Medieval Autocorrect extension is enabled</li>
+            <li>Try typing in each editor below</li>
+            <li>Type test words: <code>hello friend please thank you good</code></li>
+            <li>Press SPACE after each word to trigger transformation</li>
+            <li>All editors should transform your text to medieval English!</li>
+        </ol>
+    </div>
+
+    <div class="status">
+        ✅ If this extension is working, you should see medieval transformations in ALL editors below.
+    </div>
+
+    <div class="test-section">
+        <h2>1. Google Docs-Style ContentEditable</h2>
+        <p>This simulates Google Docs' structure with nested divs:</p>
+        <div class="docs-container">
+            <div class="docs-editor" contenteditable="true">
+                <div>
+                    <p>Start typing here: </p>
+                    <p>Try: hello my friend how are you today</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Iframe Editor (Simulates Google Docs Iframe)</h2>
+        <p>Google Docs uses iframes - this tests iframe support:</p>
+        <div class="iframe-container">
+            <iframe id="testIframe" srcdoc="<!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { 
+                        font-family: Arial; 
+                        padding: 20px; 
+                        margin: 0;
+                        background: white;
+                    }
+                    .editor { 
+                        min-height: 300px; 
+                        padding: 20px;
+                        outline: none;
+                        font-size: 12pt;
+                        line-height: 1.5;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='editor' contenteditable='true'>
+                    <p>Type inside this iframe: hello friend good</p>
+                    <p>Test phrase: please thank you very much</p>
+                </div>
+            </body>
+            </html>"></iframe>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Rich Text Editor Simulation</h2>
+        <p>Simulates Medium, WordPress, etc.:</p>
+        <div class="toolbar">
+            <button disabled>Bold</button>
+            <button disabled>Italic</button>
+            <button disabled>Underline</button>
+        </div>
+        <div class="rich-editor" contenteditable="true">
+            <p>Type your medieval text here...</p>
+            <p>Try: I really think you are very brave and good</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Complex Nested Structure</h2>
+        <p>Multiple levels of nesting (common in modern editors):</p>
+        <div contenteditable="true" style="border: 1px solid #ddd; padding: 20px; background: white;">
+            <div>
+                <div>
+                    <div>
+                        <p>Deeply nested text: hello friend please</p>
+                        <div>
+                            <span>Even deeper: thank you good</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Search Bar (Fixed)</h2>
+        <p>Testing search input that was previously not working:</p>
+        <input type="search" 
+               placeholder="Search: hello friend good" 
+               style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #1a73e8; border-radius: 24px;">
+    </div>
+
+    <div class="test-section">
+        <h2>6. Multiple Input Types</h2>
+        <div style="display: grid; gap: 10px;">
+            <input type="text" placeholder="Text: hello friend">
+            <input type="email" placeholder="Email: hello friend">
+            <input type="url" placeholder="URL: hello friend">
+            <textarea placeholder="Textarea: hello my friend how are you" style="min-height: 100px;"></textarea>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Checklist</h2>
+        <p>Check off which editors are working:</p>
+        <ul style="line-height: 2;">
+            <li>☐ Google Docs-style editor (Section 1)</li>
+            <li>☐ Iframe editor (Section 2)</li>
+            <li>☐ Rich text editor (Section 3)</li>
+            <li>☐ Nested structure (Section 4)</li>
+            <li>☐ Search bar (Section 5)</li>
+            <li>☐ All input types (Section 6)</li>
+        </ul>
+    </div>
+
+    <div class="instructions" style="background: #fff3cd; border-color: #ffc107;">
+        <strong>⚠️ Debugging Tips:</strong>
+        <ul>
+            <li>If nothing works: Check if extension is enabled in the popup</li>
+            <li>If search bar doesn't work: Try typing slowly and pressing space</li>
+            <li>If iframe doesn't work: Reload the page and try again</li>
+            <li>Open DevTools Console (F12) to see any error messages</li>
+            <li>Try reloading the extension: chrome://extensions/ → reload button</li>
+        </ul>
+    </div>
+
+    <script>
+        // Log when page loads
+        console.log('Medieval Autocorrect test page loaded');
+        console.log('Extension should be injecting into this page and all iframes');
+        
+        // Check if contentEditable elements are detected
+        setTimeout(() => {
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            console.log(`Found ${editableElements.length} contentEditable elements`);
+            
+            const iframe = document.getElementById('testIframe');
+            try {
+                if (iframe.contentDocument) {
+                    const iframeEditables = iframe.contentDocument.querySelectorAll('[contenteditable="true"]');
+                    console.log(`Found ${iframeEditables.length} contentEditable elements in iframe`);
+                }
+            } catch (e) {
+                console.log('Cannot access iframe:', e);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
