@@ -1,0 +1,15 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="128" height="128" fill="#2c1810"/>
+  
+  <!-- Border -->
+  <rect x="4" y="4" width="120" height="120" fill="none" stroke="#d4af37" stroke-width="3"/>
+  
+  <!-- Shield shape -->
+  <path d="M 64 20 L 100 30 L 100 85 L 64 110 L 28 85 L 28 30 Z" fill="#8b5a2b" stroke="#d4af37" stroke-width="2"/>
+  
+  <!-- Sword -->
+  <rect x="60" y="40" width="8" height="50" fill="#d4af37"/>
+  <rect x="50" y="50" width="28" height="6" fill="#d4af37"/>
+  <circle cx="64" cy="42" r="4" fill="#d4af37"/>
+</svg>
